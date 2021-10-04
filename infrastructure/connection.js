@@ -5,7 +5,6 @@ const connection = mysql2.createConnection({
   port: 3306,
   user: 'root',
   password: 'ximbas32',
-  database: 'gerencia_pagamentos'
 })
 
 module.exports = connection

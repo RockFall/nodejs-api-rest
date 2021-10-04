@@ -1,12 +1,55 @@
+const fs = require('fs');
+const path = require('path')
+
 class Tables {
   init(connection) {
     this.connection = connection
 
+    /*
     this.createClient()
     this.createCondo()
     this.createDebt()
     this.createLand()
-    this.createInstallment()
+    this.createInstallment()*/
+
+    this.setCurrentDB(this.createDBFromSQLFile.bind(this))
+  }
+
+  createDBFromSQLFile(data) {
+    if (data == 'refused') {
+      let queries = fs.readFileSync(path.join('./db_generation_script.sql'), { encoding: "UTF-8" }).split(";");
+      for (let query of queries) {
+        query = query.trim();
+        if (query.length !== 0 && !query.match(/\/\*/)) {
+          this.connection.query(query, function (err, sets, fields) {
+            if (err) {
+              console.log(`Importing failed for Mysql Database  - Query:${query}`);
+              console.log(err)
+            } else {
+              console.log(`Importing Mysql Database`);
+            }
+          });
+        }
+      }
+    } else if (data == 'connected') {
+      console.log('Conectado ao Database!');
+    }
+  }
+
+  setCurrentDB(callback) {
+    this.connection.query(`USE gerencia_pagamentos`, function (err, rows) {
+      if (err) {
+        if (err.errno == 1049) {
+          console.log(`${err.sqlMessage} : Failed to connect MySql database`);
+          return callback('refused');
+        } else {
+          console.log(`Mysql Database connection error`);
+          return callback('refused');
+        }
+      } else {
+        return callback('connected');
+      }
+    });
   }
 
   createClient() {
@@ -44,7 +87,7 @@ class Tables {
   }
 
   createLand() {
-    const sql = "CREATE TABLE IF NOT EXISTS `gerencia_pagamentos`.`Land` (`idLand` INT NOT NULL AUTO_INCREMENT,`codeName` VARCHAR(45) NULL,`soldDate` DATE NULL,`builtDate` DATE NULL,`idDebt` INT NOT NULL,`idClient` INT NOT NULL,`idCondo` INT NOT NULL,PRIMARY KEY (`idLand`, `idDebt`, `idClient`, `idCondo`),INDEX `fk_Land_Debt1_idx` (`idDebt` ASC) VISIBLE,INDEX `fk_Land_Client1_idx` (`idClient` ASC) VISIBLE,INDEX `fk_Land_Condo1_idx` (`idCondo` ASC) VISIBLE,CONSTRAINT `fk_Land_Debt1`  FOREIGN KEY (`idDebt`)  REFERENCES `gerencia_pagamentos`.`Debt` (`idDebt`)  ON DELETE NO ACTION  ON UPDATE NO ACTION,CONSTRAINT `fk_Land_Client1`  FOREIGN KEY (`idClient`)  REFERENCES `gerencia_pagamentos`.`Client` (`idClient`)  ON DELETE NO ACTION  ON UPDATE NO ACTION,CONSTRAINT `fk_Land_Condo1`  FOREIGN KEY (`idCondo`)  REFERENCES `gerencia_pagamentos`.`Condo` (`idCondo`)  ON DELETE NO ACTION  ON UPDATE NO ACTION)ENGINE = InnoDB;"
+    const sql = "CREATE TABLE IF NOT EXISTS `gerencia_pagamentos`.`Land` (`idLand` INT NOT NULL AUTO_INCREMENT,`codeName` VARCHAR(45) NULL,`soldDate` DATE NULL,`builtDate` DATE NULL,`idDebt` INT NULL,`idClient` INT NULL,`idCondo` INT NULL,PRIMARY KEY (`idLand`),INDEX `fk_Land_Debt1_idx` (`idDebt` ASC) VISIBLE,INDEX `fk_Land_Client1_idx` (`idClient` ASC) VISIBLE,INDEX `fk_Land_Condo1_idx` (`idCondo` ASC) VISIBLE,CONSTRAINT `fk_Land_Debt1`  FOREIGN KEY (`idDebt`)  REFERENCES `gerencia_pagamentos`.`Debt` (`idDebt`)  ON DELETE NO ACTION  ON UPDATE NO ACTION,CONSTRAINT `fk_Land_Client1`  FOREIGN KEY (`idClient`)  REFERENCES `gerencia_pagamentos`.`Client` (`idClient`)  ON DELETE NO ACTION  ON UPDATE NO ACTION,CONSTRAINT `fk_Land_Condo1`  FOREIGN KEY (`idCondo`)  REFERENCES `gerencia_pagamentos`.`Condo` (`idCondo`)  ON DELETE NO ACTION  ON UPDATE NO ACTION)ENGINE = InnoDB;"
 
     this.connection.query(sql, (erro) => {
       if(erro) {

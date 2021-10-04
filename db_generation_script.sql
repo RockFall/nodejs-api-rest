@@ -1,22 +1,6 @@
--- MySQL Workbench Forward Engineering
-
-SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
-SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
-SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
-
--- -----------------------------------------------------
--- Schema gerencia_pagamentos
--- -----------------------------------------------------
-
--- -----------------------------------------------------
--- Schema gerencia_pagamentos
--- -----------------------------------------------------
 CREATE SCHEMA IF NOT EXISTS `gerencia_pagamentos` DEFAULT CHARACTER SET utf8 ;
 USE `gerencia_pagamentos` ;
 
--- -----------------------------------------------------
--- Table `gerencia_pagamentos`.`Client`
--- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `gerencia_pagamentos`.`Client` (
   `idClient` INT NOT NULL AUTO_INCREMENT,
   `cpf` VARCHAR(11) NULL,
@@ -24,45 +8,41 @@ CREATE TABLE IF NOT EXISTS `gerencia_pagamentos`.`Client` (
   `phone` VARCHAR(14) NULL,
   `email` VARCHAR(45) NULL,
   `bankAccount` VARCHAR(45) NULL,
+  `creationDate` DATETIME NULL,
+  `lastModifiedDate` DATETIME NULL,
   PRIMARY KEY (`idClient`))
 ENGINE = InnoDB;
 
-
--- -----------------------------------------------------
--- Table `gerencia_pagamentos`.`Condo`
--- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `gerencia_pagamentos`.`Condo` (
   `idCondo` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(45) NULL,
+  `creationDate` DATETIME NULL,
+  `lastModifiedDate` DATETIME NULL,
   PRIMARY KEY (`idCondo`))
 ENGINE = InnoDB;
 
-
--- -----------------------------------------------------
--- Table `gerencia_pagamentos`.`Debt`
--- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `gerencia_pagamentos`.`Debt` (
   `idDebt` INT NOT NULL AUTO_INCREMENT,
   `totalValue` DECIMAL NULL,
   `totalInstallments` INT NULL,
   `readjustmentInstallment` INT NULL,
   `currentInstallment` INT NULL,
+  `creationDate` DATETIME NULL,
+  `lastModifiedDate` DATETIME NULL,
   PRIMARY KEY (`idDebt`))
 ENGINE = InnoDB;
 
-
--- -----------------------------------------------------
--- Table `gerencia_pagamentos`.`Land`
--- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `gerencia_pagamentos`.`Land` (
   `idLand` INT NOT NULL AUTO_INCREMENT,
   `codeName` VARCHAR(45) NULL,
   `soldDate` DATE NULL,
   `builtDate` DATE NULL,
-  `idDebt` INT NOT NULL,
-  `idClient` INT NOT NULL,
-  `idCondo` INT NOT NULL,
-  PRIMARY KEY (`idLand`, `idDebt`, `idClient`, `idCondo`),
+  `idDebt` INT NULL,
+  `idClient` INT NULL,
+  `idCondo` INT NULL,
+  `creationDate` DATETIME NULL,
+  `lastModifiedDate` DATETIME NULL,
+  PRIMARY KEY (`idLand`),
   INDEX `fk_Land_Debt1_idx` (`idDebt` ASC) VISIBLE,
   INDEX `fk_Land_Client1_idx` (`idClient` ASC) VISIBLE,
   INDEX `fk_Land_Condo1_idx` (`idCondo` ASC) VISIBLE,
@@ -83,11 +63,8 @@ CREATE TABLE IF NOT EXISTS `gerencia_pagamentos`.`Land` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
-
--- -----------------------------------------------------
--- Table `gerencia_pagamentos`.`Installment`
--- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `gerencia_pagamentos`.`Installment` (
+  `idDebt` INT NOT NULL,
   `orderCode` INT NOT NULL,
   `paymentDate` DATE NULL,
   `expiringDate` DATE NULL,
@@ -95,8 +72,9 @@ CREATE TABLE IF NOT EXISTS `gerencia_pagamentos`.`Installment` (
   `waterPrice` DECIMAL NULL,
   `energyPrice` VARCHAR(45) NULL,
   `isPaid` TINYINT NULL,
-  `idDebt` INT NOT NULL,
-  PRIMARY KEY (`orderCode`, `idDebt`),
+  `creationDate` DATETIME NULL,
+  `lastModifiedDate` DATETIME NULL,
+  PRIMARY KEY (`idDebt`, `orderCode`),
   INDEX `fk_Installment_Debt1_idx` (`idDebt` ASC) VISIBLE,
   CONSTRAINT `fk_Installment_Debt1`
     FOREIGN KEY (`idDebt`)
@@ -104,8 +82,3 @@ CREATE TABLE IF NOT EXISTS `gerencia_pagamentos`.`Installment` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
-
-
-SET SQL_MODE=@OLD_SQL_MODE;
-SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
-SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

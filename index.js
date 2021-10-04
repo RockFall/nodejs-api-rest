@@ -7,7 +7,7 @@ connection.connect(erro => {
     console.log("Um erro ocorreu ao se conectar no databse")
     console.log(erro)
   } else {
-    console.log("Conectado ao database com sucesso!")
+    console.log("Conectado ao MySQL!")
 
     Tables.init(connection)
 
