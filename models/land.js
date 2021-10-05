@@ -47,6 +47,17 @@ class Lands {
       }
     })
   }
+
+  list(res) {
+    const sql = 'SELECT * FROM land'
+
+    connection.query(sql, (err, result) => {
+      if (err)
+        res.status(400).json()
+      else
+        res.status(200).json(result)
+    })
+  }
 }
 
 module.exports = new Lands

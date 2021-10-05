@@ -15,6 +15,8 @@ class Tables {
     this.setCurrentDB(this.createDBFromSQLFile.bind(this))
   }
 
+  // Caso o Scheme 'gerencia_pagamentos', apenas retorna uma mensagem de sucesso
+  // Caso não exista, cria=o a partir de um arquivo dado
   createDBFromSQLFile(data) {
     if (data == 'refused') {
       let queries = fs.readFileSync(path.join('./db_generation_script.sql'), { encoding: "UTF-8" }).split(";");
@@ -36,6 +38,8 @@ class Tables {
     }
   }
 
+  // Se certifica de que o BD é 'gerencia_pagamentos', e
+  // chama pela função createDBFromSQLFile
   setCurrentDB(callback) {
     this.connection.query(`USE gerencia_pagamentos`, function (err, rows) {
       if (err) {
